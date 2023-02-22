@@ -2,7 +2,7 @@ h4{
   color: rgb(150, 150, 150);
 }
 
-h2, h3{
+h2{
   margin-left: 10%;
 }
 
@@ -10,8 +10,7 @@ h2, h3{
 margin-left: 10%;
 }
 
-
-p{
+.forms{
   margin-left: 10%;
   margin-right: 10%;
 }
@@ -72,3 +71,10 @@ display: table;
   margin: 0 auto;
 }
 
+.post{
+border: 2px solid black;
+  border-radius: 10px;
+  max-width: 80%;
+  margin-left: 10%;
+  margin-right: 30%;
+}

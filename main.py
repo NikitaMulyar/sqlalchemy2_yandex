@@ -1,6 +1,7 @@
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from data import db_session
 from data.users import User
+from data.news import News
 from flask import Flask, render_template, redirect
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, IntegerField
@@ -64,12 +65,13 @@ def logout():
 @app.route('/')
 @app.route('/index')
 def base():
-    """if current_user.is_authenticated:
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
         news = db_sess.query(News).filter(
             (News.user == current_user) | (News.is_private != True))
     else:
-        news = db_sess.query(News).filter(News.is_private != True)"""
-    return render_template('base.html')
+        news = db_sess.query(News).filter(News.is_private != True)
+    return render_template('news.html', news=news)
 
 
 @app.route('/register', methods=['GET', 'POST'])

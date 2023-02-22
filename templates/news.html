@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Записи в блоге</h2>
+<div id="news">
+    {% for new in news %}
+        <div class="post">
+            <h3>{{ new.title }}</h3>
+            <p>{{ new.content }}<br/>
+            Автор: {{ new.user.id }}, Дата написания: {{ new.created_date }}</p>
+        </div>
+    <br/>
+    {% endfor %}
+</div>
+{% endblock %}
