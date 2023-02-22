@@ -3,11 +3,24 @@ h4{
 }
 
 h2{
-  margin-left: 10%;
+  margin-left: 20%;
+}
+
+.news_title{
+display:inline-block;
+}
+
+h3{
+  display: table;
+  margin: 0 auto;
 }
 
 #temp{
 margin-left: 10%;
+}
+
+h5{
+margin-left: 5%;
 }
 
 .forms{
@@ -74,7 +87,12 @@ display: table;
 .post{
 border: 2px solid black;
   border-radius: 10px;
-  max-width: 80%;
-  margin-left: 10%;
-  margin-right: 30%;
+  max-width: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.private_flag{
+color: rgb(180, 180, 180);
+display:inline-block;
 }

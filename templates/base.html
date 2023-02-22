@@ -15,15 +15,18 @@
     <h1>Миссия Колонизация Марса
         <small class="text-muted">Mars One</small>
     </h1>
-</div>
+<a href="/">Главная</a> | <a href="/addjob">Добавить миссию</a><br/>
+<a>
 {% if current_user.is_authenticated %}
     <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
 {% else %}
-    <p>
+    <a>
         <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
         <a class="btn btn-success" href="/login">Войти</a>
-    </p>
+    </a>
 {% endif %}
+</a>
+</div>
 </nav>
 <h4>И на Марсе будут яблони цвести!</h4>
 {% block content %}{% endblock %}

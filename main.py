@@ -2,9 +2,10 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from data import db_session
 from data.users import User
 from data.news import News
+from data.jobs import Jobs
 from flask import Flask, render_template, redirect
 from flask_wtf import FlaskForm
-from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, IntegerField
+from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, IntegerField, DateTimeField
 from wtforms.validators import DataRequired
 
 
@@ -16,7 +17,7 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    email = StringField('Login / email', validators=[DataRequired()])
+    email = EmailField('Login / email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     password_again = PasswordField('Repeat password', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
@@ -26,6 +27,17 @@ class RegisterForm(FlaskForm):
     spec = StringField('Speciality')
     adrs = StringField("Address")
     submit = SubmitField('Register')
+
+
+class JobForm(FlaskForm):
+    email = EmailField('Team leader email', validators=[DataRequired()])
+    name = StringField('Title of job', validators=[DataRequired()])
+    w_size = IntegerField('Work size (in hours)', validators=[DataRequired()])
+    collab = StringField('Collaborators')
+    start_date = DateTimeField('Start date', default=None)
+    end_date = DateTimeField('End date', default=None)
+    done = BooleanField('Is finished?')
+    submit = SubmitField('Add job')
 
 
 app = Flask(__name__)
@@ -71,7 +83,16 @@ def base():
             (News.user == current_user) | (News.is_private != True))
     else:
         news = db_sess.query(News).filter(News.is_private != True)
-    return render_template('news.html', news=news)
+    res = db_sess.query(Jobs).all()
+    data = []
+    for job in res:
+        title = job.job
+        time = f'{round((job.end_date - job.start_date).total_seconds() / 3600)} hours'
+        team_leader = job.user.name + ' ' + job.user.surname
+        collab = job.collaborators
+        f = job.is_finished
+        data.append([title, team_leader, time, collab, f])
+    return render_template('common.html', news=news, jobs=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -101,6 +122,31 @@ def reqister():
         db_sess.commit()
         return redirect('/')
     return render_template('register.html', title='Register form', form=form)
+
+
+@app.route('/addjob', methods=['GET', 'POST'])
+@login_required
+def addjob():
+    form = JobForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user:
+            job = Jobs()
+            job.job = form.name.data
+            job.team_leader = user.id
+            job.collaborators = form.collab.data
+            job.is_finished = form.done.data
+            job.start_date = form.start_date.data
+            job.end_date = form.end_date.data
+            job.work_size = form.w_size.data
+            db_sess.add(job)
+            db_sess.commit()
+            return redirect("/")
+        return render_template('job_add.html',
+                               message="Неправильный адрес почты тимлида",
+                               form=form)
+    return render_template('job_add.html', title='Adding a Job', form=form)
 
 
 if __name__ == '__main__':

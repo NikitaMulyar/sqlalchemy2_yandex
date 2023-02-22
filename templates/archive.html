@@ -1,0 +1,17 @@
+<br/><br/><br/>
+<h2>Список работ</h2>
+<div id="jobs">
+    {% for job in jobs %}
+    {% set flag = "#c2ffde" if job.is_finished else "#fff5c2" %}
+        <div class="post">
+            <h3 class="news_title">{{ job.job }}</h3>
+            <p>Team lead id: {{ job.team_leader }}<br/>
+            Время выполнения: {{ job.work_size }} hours<br/>
+            Соучастники: {{ job.collaborators }}<br/>
+            Время начала: {{ job.start_date }}<br/>
+            Время окончания: {{ job.end_date }}<br/>
+            Статус: <div id="job_status" style="background-color: {{ flag }};">&emsp;{{"Завершена" if job.is_finished else "В процессе"}}</div></p>
+        </div>
+    <br/>
+    {% endfor %}
+</div>
