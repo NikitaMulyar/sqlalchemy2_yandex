@@ -84,15 +84,23 @@ display: table;
   margin: 0 auto;
 }
 
+#news{
+max-width: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
 .post{
 border: 2px solid black;
   border-radius: 10px;
-  max-width: 60%;
-  margin-left: 20%;
-  margin-right: 20%;
 }
 
 .private_flag{
 color: rgb(180, 180, 180);
 display:inline-block;
+}
+
+.btns{
+margin-left: 1%;
+margin-bottom: 1%;
 }
