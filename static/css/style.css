@@ -1,0 +1,74 @@
+h4{
+  color: rgb(150, 150, 150);
+}
+
+h2, h3{
+  margin-left: 10%;
+}
+
+#temp{
+margin-left: 10%;
+}
+
+
+p{
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+li{
+  margin-left: 10%;
+}
+
+img{
+  display: table;
+  margin: 0 auto;
+}
+
+table{
+  margin: 0 auto;
+  vertical-align: middle;
+  max-width: 90%;
+}
+
+#logo{
+  margin-left: 20px;
+  float: left;
+}
+
+.carousel-inner{
+display: table;
+  margin: 0 auto;
+ max-height: 40px;
+ max-width: 640px;
+}
+
+a{
+  color: #4a0000;
+}
+
+.carousel-control-next-icon:after
+{
+  content: '>';
+  font-size: 55px;
+  color: red;
+}
+
+.carousel-control-prev-icon:after {
+  content: '<';
+  font-size: 55px;
+  color: red;
+}
+
+.form_ya{
+display: table;
+  margin: 0 auto;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+
+#spec{
+display: table;
+  margin: 0 auto;
+}
+
