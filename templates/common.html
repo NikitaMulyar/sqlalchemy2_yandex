@@ -31,6 +31,17 @@
 {% for job in jobs %}
 {% set clr = "#c2ffde" if job[4] else "#fff6c1" %}
 <h5>Action #{{ loop.index }}</h5>
+{% if current_user.id == job[5] or current_user.id == 1 %}
+    <div class="btns2">
+        <a href="/addjob/{{ job[6] }}" class="btn btn-warning">
+            Изменить
+        </a>
+        <a href="/job_delete/{{ job[6] }}" class="btn btn-danger">
+            Удалить
+        </a>
+    </div>
+    <br/>
+{% endif %}
 <table class="table">
   <thead class="thead-light">
     <tr class="d-flex" style="background-color: #e1e1e1">

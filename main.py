@@ -37,7 +37,7 @@ class JobForm(FlaskForm):
     start_date = DateTimeField('Start date', default=None)
     end_date = DateTimeField('End date', default=None)
     done = BooleanField('Is finished?')
-    submit = SubmitField('Add job')
+    submit = SubmitField('Submit')
 
 
 class NewsForm(FlaskForm):
@@ -98,7 +98,7 @@ def base():
         team_leader = job.user.name + ' ' + job.user.surname
         collab = job.collaborators
         f = job.is_finished
-        data.append([title, team_leader, time, collab, f])
+        data.append([title, team_leader, time, collab, f, job.user.id, job.id])
     return render_template('common.html', news=news, jobs=data)
 
 
@@ -153,7 +153,64 @@ def addjob():
         return render_template('job_add.html',
                                message="Неправильный адрес почты тимлида",
                                form=form)
-    return render_template('job_add.html', title='Adding a Job', form=form)
+    return render_template('job_add.html', title='Добавление работы', form=form)
+
+
+@app.route('/addjob/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_jobs(id):
+    form = JobForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == id,
+                                          Jobs.user == current_user
+                                          ).first()
+        if job:
+            form.name.data = job.job
+            form.w_size.data = job.work_size
+            form.collab.data = job.collaborators
+            form.start_date.data = job.start_date
+            form.end_date.data = job.end_date
+            form.email.data = job.user.email
+            form.done.data = job.is_finished
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == id,
+                                          Jobs.user == current_user
+                                          ).first()
+        if job:
+            job.job = form.name.data
+            job.team_leader = current_user.id
+            job.collaborators = form.collab.data
+            job.is_finished = form.done.data
+            job.start_date = form.start_date.data
+            job.end_date = form.end_date.data
+            job.work_size = form.w_size.data
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('job_add.html',
+                           title='Редактирование работы',
+                           form=form
+                           )
+
+
+@app.route('/job_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def jobs_delete(id):
+    db_sess = db_session.create_session()
+    jobs = db_sess.query(Jobs).filter(Jobs.id == id,
+                                      Jobs.user == current_user
+                                      ).first()
+    if jobs:
+        db_sess.delete(jobs)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
 
 
 @app.route('/news',  methods=['GET', 'POST'])
