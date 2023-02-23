@@ -27,7 +27,8 @@
       <th scope="col" class="col-2">Team leader</th>
       <th scope="col" class="col-2">Duration</th>
       <th scope="col" class="col-2">List of collaborators</th>
-      <th scope="col" class="col-2">Is finished</th>
+        <th scope="col" class="col-1">Hazard Category</th>
+      <th scope="col" class="col-1">Is finished</th>
     </tr>
   </thead>
   <tbody>
@@ -36,7 +37,8 @@
       <td class="col-2">{{ job[1] }}</td>
       <td class="col-2">{{ job[2] }}</td>
       <td class="col-2">{{ job[3] }}</td>
-      <td class="col-2" style="background-color: {{ clr }}">{{ "Is finished" if job[4] else "Is not finished" }}</td>
+      <td class="col-1">{{ job[7] }}</td>
+      <td class="col-1" style="background-color: {{ clr }}">{{ "Is finished" if job[4] else "Is not finished" }}</td>
     </tr>
   </tbody>
 </table>

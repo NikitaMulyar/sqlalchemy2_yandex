@@ -6,7 +6,8 @@ from .db_session import SqlAlchemyBase
 
 class Jobs(SqlAlchemyBase):
     __tablename__ = 'jobs'
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
     team_leader = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'),
                                     nullable=True)
     job = sqlalchemy.Column(sqlalchemy.String, nullable=True)
@@ -17,6 +18,10 @@ class Jobs(SqlAlchemyBase):
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
 
     user = orm.relationship("User")
+
+    categories = orm.relationship("Category",
+                                  secondary="association",
+                                  backref="jobs")
 
     def __repr__(self):
         return f'<Job> {self.job}'

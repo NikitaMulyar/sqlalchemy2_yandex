@@ -10,6 +10,7 @@ from data.departments import Department
 from data.jobs import Jobs
 from data.news import News
 from data.users import User
+from data.category import Category
 
 
 class LoginForm(FlaskForm):
@@ -39,6 +40,7 @@ class JobForm(FlaskForm):
     collab = StringField('Collaborators\' IDs')
     start_date = DateTimeField('Start date', default=None)
     end_date = DateTimeField('End date', default=None)
+    hazard_level = IntegerField('Hazard level', default=None)
     done = BooleanField('Is finished?')
     submit = SubmitField('Submit')
 
@@ -115,7 +117,8 @@ def list_jobs():
         team_leader = job.user.name + ' ' + job.user.surname
         collab = job.collaborators
         f = job.is_finished
-        data.append([title, team_leader, time, collab, f, job.user.id, job.id])
+        lvl = job.categories[-1].level if len(job.categories) else None
+        data.append([title, team_leader, time, collab, f, job.user.id, job.id, lvl])
     return render_template('jobs.html', jobs=data)
 
 
@@ -164,6 +167,9 @@ def addjob():
             job.start_date = form.start_date.data
             job.end_date = form.end_date.data
             job.work_size = form.w_size.data
+            categ = Category()
+            categ.level = form.hazard_level.data
+            job.categories.append(categ)
             db_sess.add(job)
             db_sess.commit()
             return redirect("/jobs")
@@ -190,6 +196,10 @@ def edit_jobs(id):
             form.end_date.data = job.end_date
             form.email.data = job.user.email
             form.done.data = job.is_finished
+            if len(job.categories):
+                form.hazard_level.data = job.categories[-1].level
+            else:
+                form.hazard_level.data = None
         else:
             abort(404)
     if form.validate_on_submit():
@@ -209,6 +219,9 @@ def edit_jobs(id):
             job.start_date = form.start_date.data
             job.end_date = form.end_date.data
             job.work_size = form.w_size.data
+            cat = Category()
+            cat.level = form.hazard_level.data
+            job.categories.append(cat)
             db_sess.commit()
             return redirect('/jobs')
         else:
