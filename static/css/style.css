@@ -19,10 +19,6 @@ h3{
 margin-left: 10%;
 }
 
-h5, .btns2{
-margin-left: 5%;
-}
-
 .forms{
   margin-left: 10%;
   margin-right: 10%;
@@ -35,12 +31,6 @@ li{
 img{
   display: table;
   margin: 0 auto;
-}
-
-table{
-  margin: 0 auto;
-  vertical-align: middle;
-  max-width: 90%;
 }
 
 #logo{
@@ -103,4 +93,14 @@ display:inline-block;
 .btns{
 margin-left: 1%;
 margin-bottom: 1%;
+}
+
+#work_logs{
+max-width: 80%;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+#spec2{
+margin-left: 10%;
 }
