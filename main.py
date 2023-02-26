@@ -1,8 +1,10 @@
+import datetime
+
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, IntegerField, \
-    DateTimeField, TextAreaField
+    DateTimeField, TextAreaField, DateField
 from wtforms.validators import DataRequired
 
 from data import db_session
@@ -38,8 +40,10 @@ class JobForm(FlaskForm):
     name = StringField('Title of job', validators=[DataRequired()])
     w_size = IntegerField('Work size (in hours)', validators=[DataRequired()])
     collab = StringField('Collaborators\' IDs')
-    start_date = DateTimeField('Start date', default=None)
-    end_date = DateTimeField('End date', default=None)
+    start_date = DateTimeField('Start date', format='%Y-%m-%d %H:%M:%S',
+                             default=datetime.datetime(year=2023, month=2, day=25, hour=12, minute=0, second=0))
+    end_date = DateTimeField('End date', format='%Y-%m-%d %H:%M:%S',
+                             default=datetime.datetime(year=2024, month=2, day=25, hour=12, minute=0, second=0))
     hazard_level = IntegerField('Hazard level', default=None)
     done = BooleanField('Is finished?')
     submit = SubmitField('Submit')
