@@ -4,7 +4,7 @@ from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, IntegerField, \
-    DateTimeField, TextAreaField, DateField
+    DateTimeField, TextAreaField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
 
 from data import db_session
@@ -36,10 +36,10 @@ class RegisterForm(FlaskForm):
 
 
 class JobForm(FlaskForm):
-    email = EmailField('Team leader email', validators=[DataRequired()])
+    email = SelectField('Team leader email', choices=[], validators=[DataRequired()])
     name = StringField('Title of job', validators=[DataRequired()])
     w_size = IntegerField('Work size (in hours)', validators=[DataRequired()])
-    collab = StringField('Collaborators\' IDs')
+    collab = SelectMultipleField('Collaborators\' IDs', choices=[])
     start_date = DateTimeField('Start date', format='%Y-%m-%d %H:%M:%S',
                              default=datetime.datetime(year=2023, month=2, day=25, hour=12, minute=0, second=0))
     end_date = DateTimeField('End date', format='%Y-%m-%d %H:%M:%S',
@@ -58,9 +58,9 @@ class NewsForm(FlaskForm):
 
 class DepartmentForm(FlaskForm):
     title = StringField('Department name', validators=[DataRequired()])
-    email = EmailField('Chief email', validators=[DataRequired()])
+    email = SelectField('Chief email', choices=[], validators=[DataRequired()])
     email_dep = EmailField('Department email', validators=[DataRequired()])
-    members = StringField('Members\' IDs')
+    members = SelectMultipleField('Members\' IDs', choices=[])
     submit = SubmitField('Submit')
 
 
@@ -159,6 +159,11 @@ def reqister():
 @login_required
 def addjob():
     form = JobForm()
+    _tmp = db_session.create_session()
+    _res = _tmp.query(User).all()
+    for _i in _res:
+        form.email.choices.append(_i.email)
+        form.collab.choices.append(str(_i.id))
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
@@ -166,7 +171,7 @@ def addjob():
             job = Jobs()
             job.job = form.name.data
             job.team_leader = user.id
-            job.collaborators = form.collab.data
+            job.collaborators = ','.join(form.collab.data)
             job.is_finished = form.done.data
             job.start_date = form.start_date.data
             job.end_date = form.end_date.data
@@ -187,6 +192,11 @@ def addjob():
 @login_required
 def edit_jobs(id):
     form = JobForm()
+    _tmp = db_session.create_session()
+    _res = _tmp.query(User).all()
+    for _i in _res:
+        form.email.choices.append(_i.email)
+        form.collab.choices.append(str(_i.id))
     if request.method == "GET":
         db_sess = db_session.create_session()
         job = db_sess.query(Jobs).filter((Jobs.id == id),
@@ -195,7 +205,7 @@ def edit_jobs(id):
         if job:
             form.name.data = job.job
             form.w_size.data = job.work_size
-            form.collab.data = job.collaborators
+            # form.collab.data = job.collaborators
             form.start_date.data = job.start_date
             form.end_date.data = job.end_date
             form.email.data = job.user.email
@@ -218,7 +228,7 @@ def edit_jobs(id):
         if job:
             job.job = form.name.data
             job.team_leader = user.id
-            job.collaborators = form.collab.data
+            job.collaborators = ','.join(form.collab.data)
             job.is_finished = form.done.data
             job.start_date = form.start_date.data
             job.end_date = form.end_date.data
@@ -323,11 +333,16 @@ def news_delete(id):
 @login_required
 def add_depart():
     form = DepartmentForm()
+    _tmp = db_session.create_session()
+    _res = _tmp.query(User).all()
+    for _i in _res:
+        form.email.choices.append(_i.email)
+        form.members.choices.append(str(_i.id))
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         depart = Department()
         depart.title = form.title.data
-        depart.members = form.members.data
+        depart.members = ','.join(form.members.data)
         depart.email = form.email_dep.data
         res = db_sess.query(User).filter(User.email == form.email.data).first()
         if res:
@@ -345,13 +360,18 @@ def add_depart():
 @login_required
 def edit_depart(id):
     form = DepartmentForm()
+    _tmp = db_session.create_session()
+    _res = _tmp.query(User).all()
+    for _i in _res:
+        form.email.choices.append(_i.email)
+        form.members.choices.append(str(_i.id))
     if request.method == "GET":
         db_sess = db_session.create_session()
         depart = db_sess.query(Department).filter((Department.id == id),
                                                   ((Department.user == current_user) | (current_user.id == 1))).first()
         if depart:
             form.title.data = depart.title
-            form.members.data = depart.members
+            # form.members.data = ', '.join(depart.members)
             form.email_dep.data = depart.email
             form.email.data = depart.user.email
         else:
@@ -362,7 +382,7 @@ def edit_depart(id):
                                                   ((Department.user == current_user) | (current_user.id == 1))).first()
         if depart:
             depart.title = form.title.data
-            depart.members = form.members.data
+            depart.members = ','.join(form.members.data)
             depart.email = form.email_dep.data
             res = db_sess.query(User).filter(User.email == form.email.data).first()
             if res:
