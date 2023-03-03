@@ -36,7 +36,7 @@ class RegisterForm(FlaskForm):
 
 
 class JobForm(FlaskForm):
-    email = SelectField('Team leader email', choices=[], validators=[DataRequired()])
+    # email = SelectField('Team leader email', choices=[], validators=[DataRequired()])
     name = StringField('Title of job', validators=[DataRequired()])
     w_size = IntegerField('Work size (in hours)', validators=[DataRequired()])
     collab = SelectMultipleField('Collaborators\' IDs', choices=[])
@@ -162,29 +162,27 @@ def addjob():
     _tmp = db_session.create_session()
     _res = _tmp.query(User).all()
     for _i in _res:
-        form.email.choices.append(_i.email)
+        # form.email.choices.append(_i.email)
         form.collab.choices.append(str(_i.id))
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
-        if user:
-            job = Jobs()
-            job.job = form.name.data
-            job.team_leader = user.id
-            job.collaborators = ','.join(form.collab.data)
-            job.is_finished = form.done.data
-            job.start_date = form.start_date.data
-            job.end_date = form.end_date.data
-            job.work_size = form.w_size.data
-            categ = Category()
-            categ.level = form.hazard_level.data
-            job.categories.append(categ)
-            db_sess.add(job)
-            db_sess.commit()
-            return redirect("/jobs")
-        return render_template('job_add.html',
-                               message="Неправильный адрес почты тимлида",
-                               form=form)
+        job = Jobs()
+        job.job = form.name.data
+        job.team_leader = current_user.id
+        job.collaborators = ','.join(form.collab.data)
+        job.is_finished = form.done.data
+        job.start_date = form.start_date.data
+        job.end_date = form.end_date.data
+        job.work_size = form.w_size.data
+        categ = Category()
+        categ.level = form.hazard_level.data
+        job.categories.append(categ)
+        db_sess.add(job)
+        db_sess.commit()
+        """return render_template('job_add.html',
+                                       message="Неправильный адрес почты тимлида",
+                                       form=form)"""
+        return redirect("/jobs")
     return render_template('job_add.html', title='Добавление работы', form=form)
 
 
@@ -195,7 +193,7 @@ def edit_jobs(id):
     _tmp = db_session.create_session()
     _res = _tmp.query(User).all()
     for _i in _res:
-        form.email.choices.append(_i.email)
+        # form.email.choices.append(_i.email)
         form.collab.choices.append(str(_i.id))
     if request.method == "GET":
         db_sess = db_session.create_session()
@@ -208,7 +206,7 @@ def edit_jobs(id):
             # form.collab.data = job.collaborators
             form.start_date.data = job.start_date
             form.end_date.data = job.end_date
-            form.email.data = job.user.email
+            # form.email.data = job.user.email
             form.done.data = job.is_finished
             if len(job.categories):
                 form.hazard_level.data = job.categories[-1].level
@@ -221,13 +219,13 @@ def edit_jobs(id):
         job = db_sess.query(Jobs).filter((Jobs.id == id),
                                          ((Jobs.user == current_user) | (current_user.id == 1))
                                          ).first()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        """user = db_sess.query(User).filter(User.email == form.email.data).first()
         if not user:
             return render_template('job_add.html', title='Редактирование работы',
-                                   message='Неверно указана почта тимлида', form=form)
+                                   message='Неверно указана почта тимлида', form=form)"""
         if job:
             job.job = form.name.data
-            job.team_leader = user.id
+            job.team_leader = current_user.id
             job.collaborators = ','.join(form.collab.data)
             job.is_finished = form.done.data
             job.start_date = form.start_date.data
@@ -258,7 +256,7 @@ def jobs_delete(id):
         db_sess.commit()
     else:
         abort(404)
-    return redirect('/')
+    return redirect('/jobs')
 
 
 @app.route('/news', methods=['GET', 'POST'])
