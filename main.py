@@ -44,7 +44,7 @@ class JobForm(FlaskForm):
                              default=datetime.datetime(year=2023, month=2, day=25, hour=12, minute=0, second=0))
     end_date = DateTimeField('End date', format='%Y-%m-%d %H:%M:%S',
                              default=datetime.datetime(year=2024, month=2, day=25, hour=12, minute=0, second=0))
-    hazard_level = IntegerField('Hazard level', default=None)
+    hazard_level = SelectMultipleField('Hazard level', choices=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
     done = BooleanField('Is finished?')
     submit = SubmitField('Submit')
 
@@ -121,7 +121,8 @@ def list_jobs():
         team_leader = job.user.name + ' ' + job.user.surname
         collab = job.collaborators
         f = job.is_finished
-        lvl = job.categories[-1].level if len(job.categories) else None
+        cats = list(map(str, {i.level for i in job.categories}))
+        lvl = ", ".join(cats) if len(job.categories) else None
         data.append([title, team_leader, time, collab, f, job.user.id, job.id, lvl])
     return render_template('jobs.html', jobs=data)
 
@@ -174,9 +175,10 @@ def addjob():
         job.start_date = form.start_date.data
         job.end_date = form.end_date.data
         job.work_size = form.w_size.data
-        categ = Category()
-        categ.level = form.hazard_level.data
-        job.categories.append(categ)
+        for i in list(map(int, form.hazard_level.data)):
+            cat = Category()
+            cat.level = i
+            job.categories.append(cat)
         db_sess.add(job)
         db_sess.commit()
         """return render_template('job_add.html',
@@ -208,10 +210,10 @@ def edit_jobs(id):
             form.end_date.data = job.end_date
             # form.email.data = job.user.email
             form.done.data = job.is_finished
-            if len(job.categories):
-                form.hazard_level.data = job.categories[-1].level
+            """if len(job.categories):
+                form.hazard_level.data = ", ".join([i.level for i in job.categories])
             else:
-                form.hazard_level.data = None
+                form.hazard_level.data = None"""
         else:
             abort(404)
     if form.validate_on_submit():
@@ -231,9 +233,10 @@ def edit_jobs(id):
             job.start_date = form.start_date.data
             job.end_date = form.end_date.data
             job.work_size = form.w_size.data
-            cat = Category()
-            cat.level = form.hazard_level.data
-            job.categories.append(cat)
+            for i in list(map(int, form.hazard_level.data)):
+                cat = Category()
+                cat.level = i
+                job.categories.append(cat)
             db_sess.commit()
             return redirect('/jobs')
         else:
